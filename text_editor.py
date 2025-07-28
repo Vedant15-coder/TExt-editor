@@ -21,18 +21,18 @@ class AnimatedTextEditor:
         self.animation_step = 0
         self.floating_elements = []
         self.colors = {
-            'primary': '#6366f1',
-            'secondary': '#8b5cf6',
-            'accent': '#06b6d4',
-            'success': '#10b981',
-            'warning': '#f59e0b',
-            'error': '#ef4444',
-            'bg_dark': '#0f0f23',
-            'bg_light': '#1e1e3f',
+            'primary': '#2563eb',
+            'secondary': '#3b82f6',
+            'accent': '#1d4ed8',
+            'success': '#1e40af',
+            'warning': '#1e3a8a',
+            'error': '#1e40af',
+            'bg_dark': '#0f172a',
+            'bg_light': '#1e293b',
             'text_light': '#f8fafc',
             'text_muted': '#94a3b8',
             'chat_user': '#3b82f6',
-            'chat_ai': '#10b981'
+            'chat_ai': '#2563eb'
         }
         
         self.setup_welcome_screen()
@@ -186,7 +186,7 @@ class AnimatedTextEditor:
         
         self.header_label = tk.Label(
             self.header,
-            text="✨ AI Writing Assistant",
+            text="🤖 Friendly AI",
             font=("Helvetica", 20, "bold"),
             bg=self.colors['bg_light'],
             fg=self.colors['text_light']
@@ -269,7 +269,7 @@ class AnimatedTextEditor:
         self.input_text.bind("<Return>", lambda e: self.send_message())
         
         # Add welcome message
-        self.add_ai_message("Hello! I'm your AI writing assistant. How can I help you today? 🤖✨")
+        self.add_ai_message("Hello! I'm Friendly AI, your writing companion. How can I help you today? 🤖💙")
     
     def add_button_hover_effect(self, button, original_color):
         def on_enter(e):
@@ -282,14 +282,14 @@ class AnimatedTextEditor:
         button.bind("<Leave>", on_leave)
     
     def lighten_color(self, color):
-        # Simple color lightening (this is a basic implementation)
+        # Simple color lightening for blue theme
         color_map = {
-            self.colors['primary']: '#7c3aed',
-            self.colors['secondary']: '#a855f7',
-            self.colors['accent']: '#0891b2',
-            self.colors['success']: '#059669',
-            self.colors['warning']: '#d97706',
-            self.colors['error']: '#dc2626'
+            self.colors['primary']: '#3b82f6',
+            self.colors['secondary']: '#60a5fa',
+            self.colors['accent']: '#3b82f6',
+            self.colors['success']: '#3b82f6',
+            self.colors['warning']: '#3b82f6',
+            self.colors['error']: '#3b82f6'
         }
         return color_map.get(color, color)
     
