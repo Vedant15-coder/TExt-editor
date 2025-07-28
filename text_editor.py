@@ -343,6 +343,67 @@ class AnimatedTextEditor:
         self.animate_message_entrance(ai_bubble, "left")
         self.scroll_to_bottom()
     
+    def add_typing_indicator(self):
+        """Add animated typing indicator (3 dots)"""
+        self.typing_frame = tk.Frame(self.chat_scrollable_frame, bg=self.colors['bg_dark'])
+        self.typing_frame.pack(fill=tk.X, pady=(5, 10), padx=20)
+        
+        # AI typing bubble (left side)
+        self.typing_bubble = tk.Frame(self.typing_frame, bg=self.colors['chat_ai'])
+        self.typing_bubble.pack(side=tk.LEFT, padx=(0, 100))
+        
+        # Container for the dots
+        dots_container = tk.Frame(self.typing_bubble, bg=self.colors['chat_ai'])
+        dots_container.pack(padx=15, pady=10)
+        
+        # Create 3 dots
+        self.typing_dots = []
+        for i in range(3):
+            dot = tk.Label(
+                dots_container,
+                text="●",
+                font=("Arial", 16),
+                bg=self.colors['chat_ai'],
+                fg=self.colors['text_light']
+            )
+            dot.pack(side=tk.LEFT, padx=2)
+            self.typing_dots.append(dot)
+        
+        # Start the typing animation
+        self.animate_typing_dots()
+        self.scroll_to_bottom()
+        
+        return self.typing_frame
+    
+    def animate_typing_dots(self, step=0):
+        """Animate the typing dots with a wave effect"""
+        if hasattr(self, 'typing_dots') and self.typing_dots:
+            try:
+                for i, dot in enumerate(self.typing_dots):
+                    # Create a wave effect with different phases for each dot
+                    opacity_cycle = (step + i * 10) % 30
+                    if opacity_cycle < 10:
+                        dot.configure(fg=self.colors['text_light'])  # Bright
+                    elif opacity_cycle < 20:
+                        dot.configure(fg=self.colors['text_muted'])  # Medium
+                    else:
+                        dot.configure(fg=self.colors['bg_light'])    # Dim
+                
+                # Continue animation
+                self.root.after(100, lambda: self.animate_typing_dots(step + 1))
+            except tk.TclError:
+                # Widget has been destroyed, stop animation
+                pass
+    
+    def remove_typing_indicator(self):
+        """Remove the typing indicator"""
+        if hasattr(self, 'typing_frame') and self.typing_frame:
+            try:
+                self.typing_frame.destroy()
+                self.typing_dots = []
+            except tk.TclError:
+                pass
+    
     def animate_message_entrance(self, widget, direction):
         # Simple slide-in animation
         original_x = widget.winfo_x()
@@ -372,14 +433,21 @@ class AnimatedTextEditor:
             self.add_user_message(message)
             self.input_text.delete("1.0", tk.END)
             
+            # Show typing indicator
+            self.add_typing_indicator()
+            
             # Get AI response
             threading.Thread(target=self.get_ai_response, args=(message,), daemon=True).start()
     
     def get_ai_response(self, message):
         try:
             response = model.generate_content(message)
+            # Remove typing indicator and add response
+            self.root.after(0, lambda: self.remove_typing_indicator())
             self.root.after(0, lambda: self.add_ai_message(response.text))
         except Exception as e:
+            # Remove typing indicator and add error message
+            self.root.after(0, lambda: self.remove_typing_indicator())
             self.root.after(0, lambda: self.add_ai_message(f"Sorry, I encountered an error: {str(e)}"))
     
     # ---- RESTORED ORIGINAL FUNCTIONS ----
@@ -459,6 +527,10 @@ class AnimatedTextEditor:
         if message:
             self.add_user_message(f"✨ Generate: {message}")
             self.input_text.delete("1.0", tk.END)
+            
+            # Show typing indicator
+            self.add_typing_indicator()
+            
             threading.Thread(target=self.get_ai_response, args=(f"Generate creative content about: {message}",), daemon=True).start()
         else:
             self.add_ai_message("Please enter some text to generate content from!")
@@ -469,6 +541,10 @@ class AnimatedTextEditor:
         if message:
             self.add_user_message(f"📝 Summarize: {message}")
             self.input_text.delete("1.0", tk.END)
+            
+            # Show typing indicator
+            self.add_typing_indicator()
+            
             threading.Thread(target=self.get_ai_response, args=(f"Summarize this text: {message}",), daemon=True).start()
         else:
             self.add_ai_message("Please enter some text to summarize!")
@@ -479,6 +555,10 @@ class AnimatedTextEditor:
         if message:
             self.add_user_message(f"✅ Fix Grammar: {message}")
             self.input_text.delete("1.0", tk.END)
+            
+            # Show typing indicator
+            self.add_typing_indicator()
+            
             threading.Thread(target=self.get_ai_response, args=(f"Correct the grammar of the following text: {message}",), daemon=True).start()
         else:
             self.add_ai_message("Please enter some text to fix grammar!")
