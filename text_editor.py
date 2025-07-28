@@ -21,6 +21,20 @@ class AnimatedTextEditor:
         self.animation_step = 0
         self.floating_elements = []
         self.colors = {
+ cursor/animate-and-style-get-start-page-6a9f
+            'primary': '#2563eb',
+            'secondary': '#3b82f6',
+            'accent': '#1d4ed8',
+            'success': '#1e40af',
+            'warning': '#1e3a8a',
+            'error': '#1e40af',
+            'bg_dark': '#0f172a',
+            'bg_light': '#1e293b',
+            'text_light': '#f8fafc',
+            'text_muted': '#94a3b8',
+            'chat_user': '#3b82f6',
+            'chat_ai': '#2563eb'
+
             'primary': '#6366f1',
             'secondary': '#8b5cf6',
             'accent': '#06b6d4',
@@ -33,6 +47,7 @@ class AnimatedTextEditor:
             'text_muted': '#94a3b8',
             'chat_user': '#3b82f6',
             'chat_ai': '#10b981'
+ main
         }
         
         self.setup_welcome_screen()
@@ -186,7 +201,11 @@ class AnimatedTextEditor:
         
         self.header_label = tk.Label(
             self.header,
+ cursor/animate-and-style-get-start-page-6a9f
+            text="🤖 Friendly AI",
+
             text="✨ AI Writing Assistant",
+ main
             font=("Helvetica", 20, "bold"),
             bg=self.colors['bg_light'],
             fg=self.colors['text_light']
@@ -236,6 +255,17 @@ class AnimatedTextEditor:
         self.button_container = tk.Frame(self.input_frame, bg=self.colors['bg_light'])
         self.button_container.pack(side=tk.RIGHT, padx=(5, 10), pady=10)
         
+ cursor/animate-and-style-get-start-page-6a9f
+        # Action buttons with modern design - RESTORED ALL ORIGINAL FUNCTIONS
+        buttons = [
+            ("💬 Send", self.send_message, self.colors['primary']),
+            ("📂 Open", self.open_file, self.colors['accent']),  # RESTORED
+            ("💾 Save", self.save_file, self.colors['error']),
+            ("✨ Generate", self.generate_text, self.colors['secondary']),
+            ("📝 Summarize", self.summarize_text, self.colors['success']),
+            ("✅ Fix Grammar", self.correct_grammar, self.colors['warning']),
+            ("🎤 Voice", self.voice_input, self.colors['primary'])
+
         # Action buttons with modern design
         buttons = [
             ("💬 Send", self.send_message, self.colors['primary']),
@@ -244,6 +274,7 @@ class AnimatedTextEditor:
             ("✅ Fix Grammar", self.correct_grammar, self.colors['success']),
             ("🎤 Voice", self.voice_input, self.colors['warning']),
             ("💾 Save", self.save_file, self.colors['error'])
+ main
         ]
         
         for i, (text, command, color) in enumerate(buttons):
@@ -268,7 +299,11 @@ class AnimatedTextEditor:
         self.input_text.bind("<Return>", lambda e: self.send_message())
         
         # Add welcome message
+ cursor/animate-and-style-get-start-page-6a9f
+        self.add_ai_message("Hello! I'm Friendly AI, your writing companion. How can I help you today? 🤖💙")
+
         self.add_ai_message("Hello! I'm your AI writing assistant. How can I help you today? 🤖✨")
+ main
     
     def add_button_hover_effect(self, button, original_color):
         def on_enter(e):
@@ -281,6 +316,16 @@ class AnimatedTextEditor:
         button.bind("<Leave>", on_leave)
     
     def lighten_color(self, color):
+ cursor/animate-and-style-get-start-page-6a9f
+        # Simple color lightening for blue theme
+        color_map = {
+            self.colors['primary']: '#3b82f6',
+            self.colors['secondary']: '#60a5fa',
+            self.colors['accent']: '#3b82f6',
+            self.colors['success']: '#3b82f6',
+            self.colors['warning']: '#3b82f6',
+            self.colors['error']: '#3b82f6'
+
         # Simple color lightening (this is a basic implementation)
         color_map = {
             self.colors['primary']: '#7c3aed',
@@ -289,6 +334,7 @@ class AnimatedTextEditor:
             self.colors['success']: '#059669',
             self.colors['warning']: '#d97706',
             self.colors['error']: '#dc2626'
+ main
         }
         return color_map.get(color, color)
     
@@ -342,6 +388,70 @@ class AnimatedTextEditor:
         self.animate_message_entrance(ai_bubble, "left")
         self.scroll_to_bottom()
     
+ cursor/animate-and-style-get-start-page-6a9f
+    def add_typing_indicator(self):
+        """Add animated typing indicator (3 dots)"""
+        self.typing_frame = tk.Frame(self.chat_scrollable_frame, bg=self.colors['bg_dark'])
+        self.typing_frame.pack(fill=tk.X, pady=(5, 10), padx=20)
+        
+        # AI typing bubble (left side)
+        self.typing_bubble = tk.Frame(self.typing_frame, bg=self.colors['chat_ai'])
+        self.typing_bubble.pack(side=tk.LEFT, padx=(0, 100))
+        
+        # Container for the dots
+        dots_container = tk.Frame(self.typing_bubble, bg=self.colors['chat_ai'])
+        dots_container.pack(padx=15, pady=10)
+        
+        # Create 3 dots
+        self.typing_dots = []
+        for i in range(3):
+            dot = tk.Label(
+                dots_container,
+                text="●",
+                font=("Arial", 16),
+                bg=self.colors['chat_ai'],
+                fg=self.colors['text_light']
+            )
+            dot.pack(side=tk.LEFT, padx=2)
+            self.typing_dots.append(dot)
+        
+        # Start the typing animation
+        self.animate_typing_dots()
+        self.scroll_to_bottom()
+        
+        return self.typing_frame
+    
+    def animate_typing_dots(self, step=0):
+        """Animate the typing dots with a wave effect"""
+        if hasattr(self, 'typing_dots') and self.typing_dots:
+            try:
+                for i, dot in enumerate(self.typing_dots):
+                    # Create a wave effect with different phases for each dot
+                    opacity_cycle = (step + i * 10) % 30
+                    if opacity_cycle < 10:
+                        dot.configure(fg=self.colors['text_light'])  # Bright
+                    elif opacity_cycle < 20:
+                        dot.configure(fg=self.colors['text_muted'])  # Medium
+                    else:
+                        dot.configure(fg=self.colors['bg_light'])    # Dim
+                
+                # Continue animation
+                self.root.after(100, lambda: self.animate_typing_dots(step + 1))
+            except tk.TclError:
+                # Widget has been destroyed, stop animation
+                pass
+    
+    def remove_typing_indicator(self):
+        """Remove the typing indicator"""
+        if hasattr(self, 'typing_frame') and self.typing_frame:
+            try:
+                self.typing_frame.destroy()
+                self.typing_dots = []
+            except tk.TclError:
+                pass
+    
+
+ main
     def animate_message_entrance(self, widget, direction):
         # Simple slide-in animation
         original_x = widget.winfo_x()
@@ -371,12 +481,143 @@ class AnimatedTextEditor:
             self.add_user_message(message)
             self.input_text.delete("1.0", tk.END)
             
+ cursor/animate-and-style-get-start-page-6a9f
+            # Show typing indicator
+            self.add_typing_indicator()
+            
+
+ main
             # Get AI response
             threading.Thread(target=self.get_ai_response, args=(message,), daemon=True).start()
     
     def get_ai_response(self, message):
         try:
             response = model.generate_content(message)
+ cursor/animate-and-style-get-start-page-6a9f
+            # Remove typing indicator and add response
+            self.root.after(0, lambda: self.remove_typing_indicator())
+            self.root.after(0, lambda: self.add_ai_message(response.text))
+        except Exception as e:
+            # Remove typing indicator and add error message
+            self.root.after(0, lambda: self.remove_typing_indicator())
+            self.root.after(0, lambda: self.add_ai_message(f"Sorry, I encountered an error: {str(e)}"))
+    
+    # ---- RESTORED ORIGINAL FUNCTIONS ----
+    
+    def open_file(self):
+        """RESTORED: Open and load a text file into the chat"""
+        filepath = filedialog.askopenfilename(
+            filetypes=[("Text Files", "*.txt"), ("All Files", "*.*")]
+        )
+        if filepath:
+            try:
+                with open(filepath, "r", encoding="utf-8") as f:
+                    content = f.read()
+                
+                # Add the file content as a user message
+                self.add_user_message(f"📂 Loaded file: {filepath}")
+                self.add_ai_message(f"File loaded successfully! Here's the content:\n\n{content}")
+                
+                # Also put the content in the input text area for editing
+                self.input_text.delete("1.0", tk.END)
+                self.input_text.insert(tk.END, content)
+                
+            except Exception as e:
+                self.add_ai_message(f"Error loading file: {str(e)}")
+    
+    def save_file(self):
+        """ENHANCED: Save chat history or current input text"""
+        # Get current input text
+        current_input = self.input_text.get("1.0", tk.END).strip()
+        
+        if current_input:
+            # If there's text in input, save that
+            filepath = filedialog.asksaveasfilename(
+                defaultextension=".txt",
+                filetypes=[("Text Files", "*.txt"), ("All Files", "*.*")]
+            )
+            if filepath:
+                try:
+                    with open(filepath, "w", encoding="utf-8") as f:
+                        f.write(current_input)
+                    self.add_ai_message(f"💾 Current text saved to: {filepath}")
+                except Exception as e:
+                    self.add_ai_message(f"Error saving file: {str(e)}")
+        else:
+            # If no input text, save chat history
+            messages = []
+            for widget in self.chat_scrollable_frame.winfo_children():
+                for child in widget.winfo_children():
+                    if isinstance(child, tk.Frame):
+                        for label in child.winfo_children():
+                            if isinstance(label, tk.Label):
+                                text = label.cget("text")
+                                if "User:" not in text and "AI:" not in text:
+                                    # Determine if it's user or AI based on background color
+                                    bg_color = label.cget("bg")
+                                    if bg_color == self.colors['chat_user']:
+                                        messages.append(f"User: {text}")
+                                    elif bg_color == self.colors['chat_ai']:
+                                        messages.append(f"AI: {text}")
+            
+            if messages:
+                filepath = filedialog.asksaveasfilename(
+                    defaultextension=".txt",
+                    filetypes=[("Text Files", "*.txt"), ("All Files", "*.*")]
+                )
+                if filepath:
+                    try:
+                        with open(filepath, "w", encoding="utf-8") as f:
+                            f.write("\n\n".join(messages))
+                        self.add_ai_message(f"💾 Chat history saved to: {filepath}")
+                    except Exception as e:
+                        self.add_ai_message(f"Error saving chat: {str(e)}")
+    
+    def generate_text(self):
+        """RESTORED: Generate creative text based on input"""
+        message = self.input_text.get("1.0", tk.END).strip()
+        if message:
+            self.add_user_message(f"✨ Generate: {message}")
+            self.input_text.delete("1.0", tk.END)
+            
+            # Show typing indicator
+            self.add_typing_indicator()
+            
+            threading.Thread(target=self.get_ai_response, args=(f"Generate creative content about: {message}",), daemon=True).start()
+        else:
+            self.add_ai_message("Please enter some text to generate content from!")
+    
+    def summarize_text(self):
+        """RESTORED: Summarize the input text"""
+        message = self.input_text.get("1.0", tk.END).strip()
+        if message:
+            self.add_user_message(f"📝 Summarize: {message}")
+            self.input_text.delete("1.0", tk.END)
+            
+            # Show typing indicator
+            self.add_typing_indicator()
+            
+            threading.Thread(target=self.get_ai_response, args=(f"Summarize this text: {message}",), daemon=True).start()
+        else:
+            self.add_ai_message("Please enter some text to summarize!")
+    
+    def correct_grammar(self):
+        """RESTORED: Fix grammar in the input text"""
+        message = self.input_text.get("1.0", tk.END).strip()
+        if message:
+            self.add_user_message(f"✅ Fix Grammar: {message}")
+            self.input_text.delete("1.0", tk.END)
+            
+            # Show typing indicator
+            self.add_typing_indicator()
+            
+            threading.Thread(target=self.get_ai_response, args=(f"Correct the grammar of the following text: {message}",), daemon=True).start()
+        else:
+            self.add_ai_message("Please enter some text to fix grammar!")
+    
+    def voice_input(self):
+        """RESTORED: Voice input functionality"""
+=======
             self.root.after(0, lambda: self.add_ai_message(response.text))
         except Exception as e:
             self.root.after(0, lambda: self.add_ai_message(f"Sorry, I encountered an error: {str(e)}"))
@@ -403,11 +644,26 @@ class AnimatedTextEditor:
             threading.Thread(target=self.get_ai_response, args=(f"Correct the grammar of: {message}",), daemon=True).start()
     
     def voice_input(self):
+ main
         def record_voice():
             try:
                 recognizer = sr.Recognizer()
                 with sr.Microphone() as source:
                     self.root.after(0, lambda: self.add_ai_message("🎤 Listening... Please speak now!"))
+ cursor/animate-and-style-get-start-page-6a9f
+                    recognizer.adjust_for_ambient_noise(source)
+                    audio = recognizer.listen(source, timeout=10, phrase_time_limit=10)
+                
+                text = recognizer.recognize_google(audio)
+                self.root.after(0, lambda: self.input_text.insert(tk.END, text))
+                self.root.after(0, lambda: self.add_ai_message(f"Voice input received: '{text}'"))
+            except sr.UnknownValueError:
+                self.root.after(0, lambda: self.add_ai_message("Sorry, I couldn't understand the audio. Please try again."))
+            except sr.RequestError as e:
+                self.root.after(0, lambda: self.add_ai_message(f"Speech recognition error: {str(e)}"))
+            except sr.WaitTimeoutError:
+                self.root.after(0, lambda: self.add_ai_message("No speech detected. Please try again."))
+
                     audio = recognizer.listen(source, timeout=5)
                 
                 text = recognizer.recognize_google(audio)
@@ -417,11 +673,14 @@ class AnimatedTextEditor:
                 self.root.after(0, lambda: self.add_ai_message("Sorry, I couldn't understand the audio."))
             except sr.RequestError as e:
                 self.root.after(0, lambda: self.add_ai_message(f"Speech recognition error: {str(e)}"))
+ main
             except Exception as e:
                 self.root.after(0, lambda: self.add_ai_message(f"Voice input error: {str(e)}"))
         
         threading.Thread(target=record_voice, daemon=True).start()
     
+ cursor/animate-and-style-get-start-page-6a9f
+
     def save_file(self):
         # Collect all messages for saving
         messages = []
@@ -442,6 +701,7 @@ class AnimatedTextEditor:
                     f.write("\n".join(messages))
                 self.add_ai_message("💾 Chat saved successfully!")
     
+ main
     def run(self):
         self.root.mainloop()
 
