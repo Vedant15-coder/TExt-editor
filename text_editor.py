@@ -236,14 +236,15 @@ class AnimatedTextEditor:
         self.button_container = tk.Frame(self.input_frame, bg=self.colors['bg_light'])
         self.button_container.pack(side=tk.RIGHT, padx=(5, 10), pady=10)
         
-        # Action buttons with modern design
+        # Action buttons with modern design - RESTORED ALL ORIGINAL FUNCTIONS
         buttons = [
             ("💬 Send", self.send_message, self.colors['primary']),
+            ("📂 Open", self.open_file, self.colors['accent']),  # RESTORED
+            ("💾 Save", self.save_file, self.colors['error']),
             ("✨ Generate", self.generate_text, self.colors['secondary']),
-            ("📝 Summarize", self.summarize_text, self.colors['accent']),
-            ("✅ Fix Grammar", self.correct_grammar, self.colors['success']),
-            ("🎤 Voice", self.voice_input, self.colors['warning']),
-            ("💾 Save", self.save_file, self.colors['error'])
+            ("📝 Summarize", self.summarize_text, self.colors['success']),
+            ("✅ Fix Grammar", self.correct_grammar, self.colors['warning']),
+            ("🎤 Voice", self.voice_input, self.colors['primary'])
         ]
         
         for i, (text, command, color) in enumerate(buttons):
@@ -381,66 +382,130 @@ class AnimatedTextEditor:
         except Exception as e:
             self.root.after(0, lambda: self.add_ai_message(f"Sorry, I encountered an error: {str(e)}"))
     
-    def generate_text(self):
-        message = self.input_text.get("1.0", tk.END).strip()
-        if message:
-            self.add_user_message(f"Generate: {message}")
-            self.input_text.delete("1.0", tk.END)
-            threading.Thread(target=self.get_ai_response, args=(f"Generate creative content about: {message}",), daemon=True).start()
+    # ---- RESTORED ORIGINAL FUNCTIONS ----
     
-    def summarize_text(self):
-        message = self.input_text.get("1.0", tk.END).strip()
-        if message:
-            self.add_user_message(f"Summarize: {message}")
-            self.input_text.delete("1.0", tk.END)
-            threading.Thread(target=self.get_ai_response, args=(f"Summarize this text: {message}",), daemon=True).start()
-    
-    def correct_grammar(self):
-        message = self.input_text.get("1.0", tk.END).strip()
-        if message:
-            self.add_user_message(f"Fix Grammar: {message}")
-            self.input_text.delete("1.0", tk.END)
-            threading.Thread(target=self.get_ai_response, args=(f"Correct the grammar of: {message}",), daemon=True).start()
-    
-    def voice_input(self):
-        def record_voice():
+    def open_file(self):
+        """RESTORED: Open and load a text file into the chat"""
+        filepath = filedialog.askopenfilename(
+            filetypes=[("Text Files", "*.txt"), ("All Files", "*.*")]
+        )
+        if filepath:
             try:
-                recognizer = sr.Recognizer()
-                with sr.Microphone() as source:
-                    self.root.after(0, lambda: self.add_ai_message("🎤 Listening... Please speak now!"))
-                    audio = recognizer.listen(source, timeout=5)
+                with open(filepath, "r", encoding="utf-8") as f:
+                    content = f.read()
                 
-                text = recognizer.recognize_google(audio)
-                self.root.after(0, lambda: self.input_text.insert(tk.END, text))
-                self.root.after(0, lambda: self.add_ai_message(f"Voice input received: {text}"))
-            except sr.UnknownValueError:
-                self.root.after(0, lambda: self.add_ai_message("Sorry, I couldn't understand the audio."))
-            except sr.RequestError as e:
-                self.root.after(0, lambda: self.add_ai_message(f"Speech recognition error: {str(e)}"))
+                # Add the file content as a user message
+                self.add_user_message(f"📂 Loaded file: {filepath}")
+                self.add_ai_message(f"File loaded successfully! Here's the content:\n\n{content}")
+                
+                # Also put the content in the input text area for editing
+                self.input_text.delete("1.0", tk.END)
+                self.input_text.insert(tk.END, content)
+                
             except Exception as e:
-                self.root.after(0, lambda: self.add_ai_message(f"Voice input error: {str(e)}"))
-        
-        threading.Thread(target=record_voice, daemon=True).start()
+                self.add_ai_message(f"Error loading file: {str(e)}")
     
     def save_file(self):
-        # Collect all messages for saving
-        messages = []
-        for widget in self.chat_scrollable_frame.winfo_children():
-            for child in widget.winfo_children():
-                if isinstance(child, tk.Frame):
-                    for label in child.winfo_children():
-                        if isinstance(label, tk.Label):
-                            messages.append(label.cget("text"))
+        """ENHANCED: Save chat history or current input text"""
+        # Get current input text
+        current_input = self.input_text.get("1.0", tk.END).strip()
         
-        if messages:
+        if current_input:
+            # If there's text in input, save that
             filepath = filedialog.asksaveasfilename(
                 defaultextension=".txt",
                 filetypes=[("Text Files", "*.txt"), ("All Files", "*.*")]
             )
             if filepath:
-                with open(filepath, "w", encoding="utf-8") as f:
-                    f.write("\n".join(messages))
-                self.add_ai_message("💾 Chat saved successfully!")
+                try:
+                    with open(filepath, "w", encoding="utf-8") as f:
+                        f.write(current_input)
+                    self.add_ai_message(f"💾 Current text saved to: {filepath}")
+                except Exception as e:
+                    self.add_ai_message(f"Error saving file: {str(e)}")
+        else:
+            # If no input text, save chat history
+            messages = []
+            for widget in self.chat_scrollable_frame.winfo_children():
+                for child in widget.winfo_children():
+                    if isinstance(child, tk.Frame):
+                        for label in child.winfo_children():
+                            if isinstance(label, tk.Label):
+                                text = label.cget("text")
+                                if "User:" not in text and "AI:" not in text:
+                                    # Determine if it's user or AI based on background color
+                                    bg_color = label.cget("bg")
+                                    if bg_color == self.colors['chat_user']:
+                                        messages.append(f"User: {text}")
+                                    elif bg_color == self.colors['chat_ai']:
+                                        messages.append(f"AI: {text}")
+            
+            if messages:
+                filepath = filedialog.asksaveasfilename(
+                    defaultextension=".txt",
+                    filetypes=[("Text Files", "*.txt"), ("All Files", "*.*")]
+                )
+                if filepath:
+                    try:
+                        with open(filepath, "w", encoding="utf-8") as f:
+                            f.write("\n\n".join(messages))
+                        self.add_ai_message(f"💾 Chat history saved to: {filepath}")
+                    except Exception as e:
+                        self.add_ai_message(f"Error saving chat: {str(e)}")
+    
+    def generate_text(self):
+        """RESTORED: Generate creative text based on input"""
+        message = self.input_text.get("1.0", tk.END).strip()
+        if message:
+            self.add_user_message(f"✨ Generate: {message}")
+            self.input_text.delete("1.0", tk.END)
+            threading.Thread(target=self.get_ai_response, args=(f"Generate creative content about: {message}",), daemon=True).start()
+        else:
+            self.add_ai_message("Please enter some text to generate content from!")
+    
+    def summarize_text(self):
+        """RESTORED: Summarize the input text"""
+        message = self.input_text.get("1.0", tk.END).strip()
+        if message:
+            self.add_user_message(f"📝 Summarize: {message}")
+            self.input_text.delete("1.0", tk.END)
+            threading.Thread(target=self.get_ai_response, args=(f"Summarize this text: {message}",), daemon=True).start()
+        else:
+            self.add_ai_message("Please enter some text to summarize!")
+    
+    def correct_grammar(self):
+        """RESTORED: Fix grammar in the input text"""
+        message = self.input_text.get("1.0", tk.END).strip()
+        if message:
+            self.add_user_message(f"✅ Fix Grammar: {message}")
+            self.input_text.delete("1.0", tk.END)
+            threading.Thread(target=self.get_ai_response, args=(f"Correct the grammar of the following text: {message}",), daemon=True).start()
+        else:
+            self.add_ai_message("Please enter some text to fix grammar!")
+    
+    def voice_input(self):
+        """RESTORED: Voice input functionality"""
+        def record_voice():
+            try:
+                recognizer = sr.Recognizer()
+                with sr.Microphone() as source:
+                    self.root.after(0, lambda: self.add_ai_message("🎤 Listening... Please speak now!"))
+                    recognizer.adjust_for_ambient_noise(source)
+                    audio = recognizer.listen(source, timeout=10, phrase_time_limit=10)
+                
+                text = recognizer.recognize_google(audio)
+                self.root.after(0, lambda: self.input_text.insert(tk.END, text))
+                self.root.after(0, lambda: self.add_ai_message(f"Voice input received: '{text}'"))
+            except sr.UnknownValueError:
+                self.root.after(0, lambda: self.add_ai_message("Sorry, I couldn't understand the audio. Please try again."))
+            except sr.RequestError as e:
+                self.root.after(0, lambda: self.add_ai_message(f"Speech recognition error: {str(e)}"))
+            except sr.WaitTimeoutError:
+                self.root.after(0, lambda: self.add_ai_message("No speech detected. Please try again."))
+            except Exception as e:
+                self.root.after(0, lambda: self.add_ai_message(f"Voice input error: {str(e)}"))
+        
+        threading.Thread(target=record_voice, daemon=True).start()
     
     def run(self):
         self.root.mainloop()
