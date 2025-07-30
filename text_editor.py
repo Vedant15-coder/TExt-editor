@@ -20,90 +20,61 @@ class AnimatedTextEditor:
         # Animation variables
         self.animation_step = 0
         self.floating_elements = []
-        self.colors = {
- cursor/animate-and-style-get-start-page-6a9f
-            'primary': '#2563eb',
-            'secondary': '#3b82f6',
-            'accent': '#1d4ed8',
-            'success': '#1e40af',
-            'warning': '#1e3a8a',
-            'error': '#1e40af',
-            'bg_dark': '#0f172a',
-            'bg_light': '#1e293b',
-            'text_light': '#f8fafc',
-            'text_muted': '#94a3b8',
-            'chat_user': '#3b82f6',
-            'chat_ai': '#2563eb'
-
+                self.colors = {
             'primary': '#6366f1',
             'secondary': '#8b5cf6',
             'accent': '#06b6d4',
             'success': '#10b981',
             'warning': '#f59e0b',
             'error': '#ef4444',
-            'bg_dark': '#0f0f23',
-            'bg_light': '#1e1e3f',
-            'text_light': '#f8fafc',
-            'text_muted': '#94a3b8',
+            'bg_dark': '#ffffff',  # Changed to white
+            'bg_light': '#f8fafc',  # Light background
+            'text_light': '#1e293b',  # Dark text for visibility
+            'text_muted': '#64748b',  # Muted dark text
             'chat_user': '#3b82f6',
             'chat_ai': '#10b981'
- main
         }
         
         self.setup_welcome_screen()
         
     def setup_welcome_screen(self):
-        # Main welcome frame with gradient effect
+        # Main welcome frame - simple and clean
         self.welcome_frame = tk.Frame(self.root, bg=self.colors['bg_dark'])
         self.welcome_frame.place(relwidth=1, relheight=1)
         
-        # Create animated background elements
-        self.canvas = tk.Canvas(
-            self.welcome_frame, 
-            bg=self.colors['bg_dark'], 
-            highlightthickness=0
-        )
-        self.canvas.place(relwidth=1, relheight=1)
-        
-        # Create floating geometric shapes
-        self.create_floating_elements()
-        
-        # Welcome text with gradient effect
+        # Welcome text - simple and clean
         self.welcome_label = tk.Label(
             self.welcome_frame,
-            text="Welcome back Vedant! ✨",
+            text="Welcome back, Vedant!",
             font=("Helvetica", 32, "bold"),
             bg=self.colors['bg_dark'],
             fg=self.colors['text_light']
         )
-        self.welcome_label.place(relx=0.5, rely=0.3, anchor="center")
+        self.welcome_label.place(relx=0.5, rely=0.4, anchor="center")
         
         self.subtitle_label = tk.Label(
             self.welcome_frame,
-            text="Your AI-powered writing companion awaits",
+            text="How can I help you today?",
             font=("Helvetica", 16),
             bg=self.colors['bg_dark'],
             fg=self.colors['text_muted']
         )
-        self.subtitle_label.place(relx=0.5, rely=0.38, anchor="center")
+        self.subtitle_label.place(relx=0.5, rely=0.48, anchor="center")
         
-        # Animated get started button
+        # Simple get started button
         self.get_started_btn = tk.Button(
             self.welcome_frame,
-            text="🚀 Get Started",
-            font=("Arial", 18, "bold"),
+            text="Get Started ✨",
+            font=("Arial", 16, "bold"),
             bg=self.colors['primary'],
-            fg=self.colors['text_light'],
-            padx=40,
-            pady=15,
+            fg='white',
+            padx=30,
+            pady=12,
             relief=tk.FLAT,
             cursor="hand2",
             command=self.launch_chat_interface
         )
-        
-        # Start animations
-        self.animate_welcome_elements()
-        self.animate_floating_shapes()
+        self.get_started_btn.place(relx=0.5, rely=0.58, anchor="center")
         
     def create_floating_elements(self):
         # Create various floating shapes
