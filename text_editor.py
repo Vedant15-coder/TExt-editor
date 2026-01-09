@@ -6,14 +6,9 @@ import threading
 import speech_recognition as sr
 
 # -- API KEY via environment variable
-API_KEY = os.getenv("AIzaSyB44yyxyf8atB3Tefp7C2eMczhokKPVGc8") or "AIzaSyB44yyxyf8atB3Tefp7C2eMczhokKPVGc8"
 
 # For demo/testing; use environment for production!
-genai.configure(api_key="AIzaSyB44yyxyf8atB3Tefp7C2eMczhokKPVGc8")
 
-model = genai.GenerativeModel("gemini-1.5-flash")
-    
-chat_history = []
 
 # === SAVE CHAT FUNCTION (moved up to prevent NameError) ===
 def save_chat():
